@@ -6,6 +6,7 @@
 #include <map>
 #include <tuple>
 #include <fstream>
+#include <optional>
 
 using namespace std;
 
@@ -103,27 +104,34 @@ int main()
         // by default
     }
 
+    // init vars
+    vector<tuple<int, int>> next_positions;
+    tuple<int, int> next_pos;
+    next_pos = start_pos;
+
     // loop start
-
-    // get options
-    vector<tuple<int, int>> next_positions = get_next_positions(start_pos);
-    vector<int> default_order = vector<int>{0, 1, 2, 3}; // S, E, N, W
-
-    clog << "start position: ";
-    printTuple(start_pos);
-    //clog << "\n";
-
-    // check next position situation
-    tuple<int, int> next_pos = next_positions[0];
-    string next_pos_value = wmap[
-        get<0>(next_pos)][get<1>(next_pos)
-    ];
-    
-    cout << "\ntop check: "<< next_pos_value << "\n";
-
-    if(next_pos_value == EMPTY)
+    for(int i; i < 2; i++)
     {
-        cout << "SOUTH" << endl;
+        // get options
+        next_positions = get_next_positions(start_pos);
+        vector<int> default_order = vector<int>{0, 1, 2, 3}; // S, E, N, W
+
+        clog << "start position: ";
+        printTuple(start_pos);
+        //clog << "\n";
+
+        // check next position situation
+        next_pos = next_positions[0];
+        string next_pos_value = wmap[
+            get<0>(next_pos)][get<1>(next_pos)
+        ];
+        
+        std::cout << "\ntop check: "<< next_pos_value << "\n";
+
+        if(next_pos_value == EMPTY)
+        {
+            std::cout << "SOUTH" << endl;
+        }
     }
 
     // get the next position
@@ -133,7 +141,7 @@ int main()
     // Write an answer using cout. DON'T FORGET THE "<< endl"
     // To debug: cerr << "Debug messages..." << endl;
 
-    cout << "answer" << endl;
+    std::cout << "answer" << endl;
 
     return 0;
 }
