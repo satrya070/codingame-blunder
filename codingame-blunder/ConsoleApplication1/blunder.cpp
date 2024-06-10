@@ -16,9 +16,9 @@ using namespace std;
  **/
 
 template<size_t Index = 0, typename... Types>
-void printTuple(const tuple<Types...> &myTuple)
+void printTuple(const tuple<Types...>& myTuple)
 {
-    if constexpr(Index < sizeof...(Types))
+    if constexpr (Index < sizeof...(Types))
     {
         cout << get<Index>(myTuple) << " ";
         printTuple<Index + 1>(myTuple);
@@ -40,14 +40,15 @@ vector<tuple<int, int>> get_next_positions(
     tuple<int, int> west = tuple<int, int>(CurrentRow, CurrentCol - 1);
 
     vector<tuple<int, int>> next_positions;
-    next_positions = {south, east, north, west};
+    next_positions = { south, east, north, west };
 
-    if(reversed)
+    if (reversed == true)
     {
-        next_positions = {west, north, east, south};
+        cout << "false reversed next positions..." << '\n';
+        next_positions = { west, north, east, south };
     }
 
-    return ;
+    return next_positions;
 }
 
 int main()
@@ -84,16 +85,16 @@ int main()
     vector<tuple<int, int>> direction;
     //cin >> l >> c; cin.ignore();
 
+    // construct the map in an array
     map<int, map<int, string>> wmap;
-    
     for (int i = 0; i < l; i++) {
         string row;
         getline(inputFile, row);
 
-        for(int j = 0;j < l; j++)
+        for (int j = 0; j < l; j++)
         {
             // define start position
-            if(row[j] == '@')
+            if (row[j] == '@')
             {
                 start_pos = tuple(i, j);
             }
@@ -104,39 +105,47 @@ int main()
         // by default
     }
 
+    inputFile.close();
+
+
+
     // init vars
     vector<tuple<int, int>> next_positions;
     tuple<int, int> next_pos;
     next_pos = start_pos;
 
     // loop start
-    for(int i; i < 2; i++)
+    for (int i = 0; i < 3; i++)
     {
         // get options
-        next_positions = get_next_positions(start_pos);
-        vector<int> default_order = vector<int>{0, 1, 2, 3}; // S, E, N, W
+        next_positions = get_next_positions(next_pos);
+        vector<int> default_order = vector<int>{ 0, 1, 2, 3 }; // S, E, N, W
 
-        clog << "start position: ";
-        printTuple(start_pos);
-        //clog << "\n";
+        //clog << "start position: ";
+        //printTuple(start_pos);
+        // log positions
+        cout << "current position: ";
+        printTuple(next_pos);
+        cout << " - next_position: ";
+        printTuple(next_positions[0]);
 
         // check next position situation
         next_pos = next_positions[0];
         string next_pos_value = wmap[
             get<0>(next_pos)][get<1>(next_pos)
         ];
-        
-        std::cout << "\ntop check: "<< next_pos_value << "\n";
 
-        if(next_pos_value == EMPTY)
+        std::cout << "\nnext direction: " << next_pos_value << "\n";
+
+        if (next_pos_value == EMPTY)
         {
             std::cout << "SOUTH" << endl;
         }
+        else
+        {
+            cout << "implement!";
+        }
     }
-
-    // get the next position
-    next_positions = get_next_positions(next_pos);
-    printTuple(next_positions[0]);
 
     // Write an answer using cout. DON'T FORGET THE "<< endl"
     // To debug: cerr << "Debug messages..." << endl;
