@@ -51,6 +51,8 @@ vector<tuple<int, int>> get_next_positions(
     return next_positions;
 }
 
+
+
 int main()
 {
     const string EMPTY = " ";
@@ -62,6 +64,7 @@ int main()
     const char WEST = 'W';
     const char BEER = 'B';
     const char TELEPORT = 'T';
+    const char BOOTH = '$';
 
     ifstream inputFile("./input.txt");
 
@@ -69,15 +72,6 @@ int main()
         std::cerr << "Error opening the file." << std::endl;
         return 1; // Return error code
     }
-
-    // input from codeingame
-    // string input_line;
-    // while(getline(inputFile, input_line))
-    // {
-    //     cout << input_line << endl;
-    // };
-    // cout << "lalalaal"  << endl;
-    // cout << 'a';
 
     int l = 5;
     int c = 5;
@@ -115,8 +109,10 @@ int main()
     next_pos = start_pos;
 
     // loop start
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 4; i++)
     {
+        bool processed_next_direction = false;
+
         // get options
         next_positions = get_next_positions(next_pos);
         vector<int> default_order = vector<int>{ 0, 1, 2, 3 }; // S, E, N, W
@@ -130,21 +126,32 @@ int main()
         printTuple(next_positions[0]);
 
         // check next position situation
-        next_pos = next_positions[0];
+        int index_next_position = 0;
+        next_pos = next_positions[index_next_position];
         string next_pos_value = wmap[
             get<0>(next_pos)][get<1>(next_pos)
-        ];
+            ];
 
-        std::cout << "\nnext direction: " << next_pos_value << "\n";
+            std::cout << "\nnext direction: " << next_pos_value << "\n";
 
-        if (next_pos_value == EMPTY)
-        {
-            std::cout << "SOUTH" << endl;
-        }
-        else
-        {
-            cout << "implement!";
-        }
+            while (processed_next_direction == false)
+                if (next_pos_value == EMPTY)
+                {
+                    std::cout << "SOUTH" << endl;
+                    processed_next_direction = true;
+                }
+                else if (next_pos_value == string(1, OBSTACLE))
+                {
+                    index_next_position += 1;
+                    next_pos = next_positions[index_next_position];
+                    next_pos_value = wmap[get<0>(next_pos)][get<1>(next_pos)];
+                    continue;
+                }
+                else if (next_pos_value == string(1, BOOTH))
+                {
+                    cout << "Done it, live!!!";
+                    break;
+                }
     }
 
     // Write an answer using cout. DON'T FORGET THE "<< endl"
