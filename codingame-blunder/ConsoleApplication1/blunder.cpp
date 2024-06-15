@@ -65,20 +65,20 @@ vector<tuple<int, int>> get_next_positions(
 }
 
 
-tuple<int, int> get_next_modifier_pos(const char modifier, tuple<int, int> current_pos)
+tuple<int, int> get_next_modifier_pos(tuple<int, int> current_pos)
 {
 	int new_pos_r = get<0>(current_pos);
 	int new_pos_c = get<1>(current_pos);
 
-	if (modifier == 'N')
+	if (MODIFIER == 'N')
 	{
 		new_pos_r -= 1;
 	}
-	else if (modifier == 'E')
+	else if (MODIFIER == 'E')
 	{
 		new_pos_c += 1;
 	}
-	else if (modifier == 'S')
+	else if (MODIFIER == 'S')
 	{
 		new_pos_r += 1;
 	}
@@ -91,19 +91,28 @@ tuple<int, int> get_next_modifier_pos(const char modifier, tuple<int, int> curre
 }
 
 
-bool check_modier(char new_pos_value)
-{
+bool check_modier(string new_pos_value)
+{	
+	char pos_value = new_pos_value.at(0);
 	bool is_modifier = false;
-	switch(new_pos_value)
+	switch(pos_value)
 	{
 		case 'S':
 			is_modifier = true;
+			MODIFIER = 'S';
+			break;
 		case 'E':
 			is_modifier = true;
+			MODIFIER = 'E';
+			break;
 		case 'N':
 			is_modifier = true;
+			MODIFIER = 'N';
+			break;
 		case 'W':
 			is_modifier = true;
+			MODIFIER = 'W';
+			break;
 		default:
 			break;
 	}
@@ -162,7 +171,7 @@ int main()
 	};
 
 	// loop start
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 10; i++)
 	{
 		bool processed_next_direction = false;
 		int index_direction = 0;
@@ -176,7 +185,7 @@ int main()
 		else
 		{
 			// just get the next modifier position
-			current_pos = get_next_modifier_pos(MODIFIER, current_pos);
+			current_pos = get_next_modifier_pos(current_pos);
 			// TODO make it return index_next_position
 		}
 
@@ -186,20 +195,16 @@ int main()
 		// log positions
 		cout << "current position: ";
 		printTuple(current_pos);
-		cout << " - next_position: ";
-		printTuple(next_positions[0]);
+		//cout << " - next_position: ";
+		//printTuple(next_positions[0]);
 
 		// proces next position conditions (if any)
 		string next_pos_value = wmap[
 			get<0>(current_pos)][get<1>(current_pos)
 		];
 
-		std::cout << "\nnext direction: " << next_pos_value << "\n";
-
 		// process non (non-modifier) place
 		while (processed_next_direction == false)
-			// if modifier
-			// set modifier true
 			if (next_pos_value == EMPTY)
 			{
 				cout << directionPrints[index_direction];
@@ -213,10 +218,10 @@ int main()
 				next_pos_value = wmap[get<0>(current_pos)][get<1>(current_pos)];
 				continue;
 			}
-			else if (check_modier(next_pos_value[0]))
+			else if (check_modier(next_pos_value))
 			{
-				// TODO get modifier
-				MODIFIER = true;
+				// check_modifier ^ updates the global MODIFIER if there is one.
+				processed_next_direction = true;
 			}
 			else if (next_pos_value == string(1, BOOTH))
 			{
