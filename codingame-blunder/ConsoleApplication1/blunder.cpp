@@ -15,6 +15,20 @@ using namespace std;
  * the standard input according to the problem statement.
  **/
 
+const string EMPTY = " ";
+const char OBSTACLEX = 'X';
+const char OBSTACLE = '#';
+const char SOUTH = 'S';
+const char EAST = 'E';
+const char NORTH = 'N';
+const char WEST = 'W';
+const char BEER = 'B';
+const char TELEPORT = 'T';
+const char BOOTH = '$';
+
+const bool RESERVED = false;
+const char MODIFIER = '0';
+
 template<size_t Index = 0, typename... Types>
 void printTuple(const tuple<Types...>& myTuple)
 {
@@ -26,7 +40,7 @@ void printTuple(const tuple<Types...>& myTuple)
 }
 
 vector<tuple<int, int>> get_next_positions(
-    const tuple<int, int> CurrentPos, optional<bool> reversed = false
+    const tuple<int, int> CurrentPos
 )
 {
     int CurrentRow = get<0>(CurrentPos);
@@ -42,9 +56,8 @@ vector<tuple<int, int>> get_next_positions(
     vector<tuple<int, int>> next_positions;
     next_positions = { south, east, north, west };
 
-    if (reversed == true)
+    if (RESERVED == true)
     {
-        cout << "false reversed next positions..." << '\n';
         next_positions = { west, north, east, south };
     }
 
@@ -52,20 +65,35 @@ vector<tuple<int, int>> get_next_positions(
 }
 
 
+tuple<int, int> get_next_modifier_pos(const char modifier, tuple<int, int> current_pos)
+{
+    int new_pos_r = get<0>(current_pos);
+    int new_pos_c = get<1>(current_pos);
+
+    if (modifier == 'N')
+    {
+        new_pos_r -= 1;
+    }
+    else if (modifier == 'E')
+    {
+        new_pos_c += 1;
+    }
+    else if (modifier == 'S')
+    {
+        new_pos_r += 1;
+    }
+    else  // W
+    {
+        new_pos_c -= 1;
+    }
+
+    return make_tuple(new_pos_r, new_pos_c);
+}
+
+
 
 int main()
 {
-    const string EMPTY = " ";
-    const char OBSTACLEX = 'X';
-    const char OBSTACLE = '#';
-    const char SOUTH = 'S';
-    const char EAST = 'E';
-    const char NORTH = 'N';
-    const char WEST = 'W';
-    const char BEER = 'B';
-    const char TELEPORT = 'T';
-    const char BOOTH = '$';
-
     ifstream inputFile("./input.txt");
 
     if (!inputFile.is_open()) {
@@ -73,8 +101,8 @@ int main()
         return 1; // Return error code
     }
 
-    int l = 5;
-    int c = 5;
+    int l = 10;
+    int c = 10;
     tuple<int, int> start_pos;
     vector<tuple<int, int>> direction;
     //cin >> l >> c; cin.ignore();
@@ -105,8 +133,8 @@ int main()
 
     // init vars
     vector<tuple<int, int>> next_positions;
-    tuple<int, int> next_pos;
-    next_pos = start_pos;
+    tuple<int, int> current_pos;
+    current_pos = start_pos;
 
     // loop start
     for (int i = 0; i < 4; i++)
@@ -114,37 +142,43 @@ int main()
         bool processed_next_direction = false;
 
         // get options
-        next_positions = get_next_positions(next_pos);
-        vector<int> default_order = vector<int>{ 0, 1, 2, 3 }; // S, E, N, W
+        if (MODIFIER == false)
+        {
+            next_positions = get_next_positions(current_pos);
+        }
+        else
+        {
+            current_pos = get_next_modifier_pos(MODIFIER, current_pos);
+        }
 
-        //clog << "start position: ";
-        //printTuple(start_pos);
         // log positions
         cout << "current position: ";
-        printTuple(next_pos);
+        printTuple(current_pos);
         cout << " - next_position: ";
         printTuple(next_positions[0]);
 
-        // check next position situation
+        // proces next position conditions (if any)
         int index_next_position = 0;
-        next_pos = next_positions[index_next_position];
+        current_pos = next_positions[index_next_position];
         string next_pos_value = wmap[
-            get<0>(next_pos)][get<1>(next_pos)
+            get<0>(current_pos)][get<1>(current_pos)
             ];
 
             std::cout << "\nnext direction: " << next_pos_value << "\n";
 
+            // process non (non-modifier) place
             while (processed_next_direction == false)
+                
                 if (next_pos_value == EMPTY)
                 {
-                    std::cout << "SOUTH" << endl;
+                    cout << "SOUTH" << endl;
                     processed_next_direction = true;
                 }
                 else if (next_pos_value == string(1, OBSTACLE))
                 {
                     index_next_position += 1;
-                    next_pos = next_positions[index_next_position];
-                    next_pos_value = wmap[get<0>(next_pos)][get<1>(next_pos)];
+                    current_pos = next_positions[index_next_position];
+                    next_pos_value = wmap[get<0>(current_pos)][get<1>(current_pos)];
                     continue;
                 }
                 else if (next_pos_value == string(1, BOOTH))
