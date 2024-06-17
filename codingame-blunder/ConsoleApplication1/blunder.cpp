@@ -169,10 +169,17 @@ int main()
 		{2, "NORTH"},
 		{3, "WEST"}
 	};
+	bool endgame = false;
 
 	// loop start
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 100; i++)
 	{
+		// check if solution found
+		if (endgame == true)
+		{
+			break;
+		}
+
 		bool processed_next_direction = false;
 		int index_direction = 0;
 
@@ -186,11 +193,8 @@ int main()
 		{
 			// just get the next modifier position
 			current_pos = get_next_modifier_pos(current_pos);
-			// TODO make it return index_next_position
+			// TODO set the correct index_direction
 		}
-
-		// check if the position is a modifier (S, E, N, W)
-		//case()
 
 		// log positions
 		cout << "current position: ";
@@ -203,7 +207,7 @@ int main()
 			get<0>(current_pos)][get<1>(current_pos)
 		];
 
-		// process non (non-modifier) place
+		// process next to be pos (non-modifier)
 		while (processed_next_direction == false)
 			if (next_pos_value == EMPTY)
 			{
@@ -226,8 +230,12 @@ int main()
 			else if (next_pos_value == string(1, BOOTH))
 			{
 				cout << "Done it, live!!!";
+				endgame = true;
 				break;
 			}
+
+		// output direction
+		// TODO func with 
 	}
 
 	// Write an answer using cout. DON'T FORGET THE "<< endl"
