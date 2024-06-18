@@ -29,6 +29,13 @@ const char BOOTH = '$';
 const bool RESERVED = false;
 char MODIFIER = '0';
 
+map<char, int> modifier_directions = {
+	{'S', 0},
+	{'E', 1},
+	{'N', 2},
+	{'W', 3}
+};
+
 template<size_t Index = 0, typename... Types>
 void printTuple(const tuple<Types...>& myTuple)
 {
@@ -91,7 +98,7 @@ tuple<int, int> get_next_modifier_pos(tuple<int, int> current_pos)
 }
 
 
-bool check_modier(string new_pos_value)
+bool check_set_modifier(string new_pos_value)
 {	
 	char pos_value = new_pos_value.at(0);
 	bool is_modifier = false;
@@ -118,6 +125,7 @@ bool check_modier(string new_pos_value)
 	}
 	return is_modifier;
 }
+
 
 
 int main()
@@ -172,35 +180,28 @@ int main()
 	bool endgame = false;
 
 	// loop start
-	for (int i = 0; i < 100; i++)
+	int loophole_index = 0;
+	while(endgame != true)
 	{
-		// check if solution found
-		if (endgame == true)
-		{
-			break;
-		}
-
 		bool processed_next_direction = false;
 		int index_direction = 0;
 
-		// get options
-		if (MODIFIER == '0')
-		{
-			next_positions = get_next_positions(current_pos);
-			current_pos = next_positions[index_direction];
-		}
-		else
-		{
-			// just get the next modifier position
-			current_pos = get_next_modifier_pos(current_pos);
-			// TODO set the correct index_direction
-		}
-
-		// log positions
-		cout << "current position: ";
-		printTuple(current_pos);
-		//cout << " - next_position: ";
-		//printTuple(next_positions[0]);
+		// for very first iteration no need to fetch direction
+		//if (loophole_index > 0)
+		//{
+			// fetch the next step
+			if (MODIFIER == '0')
+			{
+				next_positions = get_next_positions(current_pos);
+				current_pos = next_positions[index_direction];
+			}
+			else
+			{
+				// just get the next modifier position
+				current_pos = get_next_modifier_pos(current_pos);
+				index_direction = modifier_directions[MODIFIER];
+			}
+		//}
 
 		// proces next position conditions (if any)
 		string next_pos_value = wmap[
@@ -211,7 +212,6 @@ int main()
 		while (processed_next_direction == false)
 			if (next_pos_value == EMPTY)
 			{
-				cout << directionPrints[index_direction];
 				processed_next_direction = true;
 			}
 			else if (next_pos_value == string(1, OBSTACLE))
@@ -222,26 +222,32 @@ int main()
 				next_pos_value = wmap[get<0>(current_pos)][get<1>(current_pos)];
 				continue;
 			}
-			else if (check_modier(next_pos_value))
+			else if (check_set_modifier(next_pos_value))
 			{
 				// check_modifier ^ updates the global MODIFIER if there is one.
 				processed_next_direction = true;
 			}
 			else if (next_pos_value == string(1, BOOTH))
 			{
-				cout << "Done it, live!!!";
 				endgame = true;
 				break;
 			}
 
+		// log positions
+		//cout << "current position: ";
+		printTuple(current_pos);
+		//cout << " - next_position: ";
+		//printTuple(next_positions[0]);
+
 		// output direction
-		// TODO func with 
+		cout << directionPrints[index_direction] << '\n';
+
+		// increment loop
+		loophole_index += 1;
 	}
 
 	// Write an answer using cout. DON'T FORGET THE "<< endl"
 	// To debug: cerr << "Debug messages..." << endl;
-
-	std::cout << "answer" << endl;
 
 	return 0;
 }
