@@ -214,7 +214,17 @@ int main()
 			{
 				processed_next_direction = true;
 			}
-			else if (next_pos_value == string(1, OBSTACLE))
+			else if ((next_pos_value == string(1, OBSTACLE)) || (next_pos_value == string(1, OBSTACLEX)) )
+			{
+				// TODO break X if in breaker mode
+
+				// blockade so change direction
+				index_direction += 1;
+				current_pos = next_positions[index_direction];
+				next_pos_value = wmap[get<0>(current_pos)][get<1>(current_pos)];
+				continue;
+			}
+			else if (next_pos_value == string(1, OBSTACLEX))
 			{
 				// blockade so change direction
 				index_direction += 1;
