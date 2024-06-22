@@ -25,15 +25,25 @@ const char WEST = 'W';
 const char BEER = 'B';
 const char TELEPORT = 'T';
 const char BOOTH = '$';
+const char INVERTER = 'I';
 
-const bool RESERVED = false;
+bool INVERTED = false;
 char MODIFIER = '0';
+char DIRECTION = 'S';
 
-map<char, int> modifier_directions = {
+
+map<char, int> direction_index_map = {
 	{'S', 0},
 	{'E', 1},
 	{'N', 2},
 	{'W', 3}
+};
+
+map<char, int> index_direction_map = {
+	{0, 'S'},
+	{1, 'E'},
+	{2, 'N'},
+	{3, 'W'}
 };
 
 template<size_t Index = 0, typename... Types>
@@ -50,6 +60,7 @@ vector<tuple<int, int>> get_next_positions(
 	const tuple<int, int> CurrentPos
 )
 {
+	// gives back the position is the set order of S-E-N-W
 	int CurrentRow = get<0>(CurrentPos);
 	int CurrentCol = get<1>(CurrentPos);
 
@@ -63,29 +74,24 @@ vector<tuple<int, int>> get_next_positions(
 	vector<tuple<int, int>> next_positions;
 	next_positions = { south, east, north, west };
 
-	if (RESERVED == true)
-	{
-		next_positions = { west, north, east, south };
-	}
-
 	return next_positions;
 }
 
 
-tuple<int, int> get_next_modifier_pos(tuple<int, int> current_pos)
+tuple<int, int> get_next_pos(tuple<int, int> current_pos, char direction_identifier)
 {
 	int new_pos_r = get<0>(current_pos);
 	int new_pos_c = get<1>(current_pos);
 
-	if (MODIFIER == 'N')
+	if (direction_identifier == 'N')
 	{
 		new_pos_r -= 1;
 	}
-	else if (MODIFIER == 'E')
+	else if (direction_identifier == 'E')
 	{
 		new_pos_c += 1;
 	}
-	else if (MODIFIER == 'S')
+	else if (direction_identifier == 'S')
 	{
 		new_pos_r += 1;
 	}
@@ -137,8 +143,8 @@ int main()
 		return 1; // Return error code
 	}
 
-	int l = 10;
-	int c = 10;
+	int l = 8;
+	int c = 8;
 	tuple<int, int> start_pos;
 	vector<tuple<int, int>> direction;
 	//cin >> l >> c; cin.ignore();
@@ -186,22 +192,22 @@ int main()
 		bool processed_next_direction = false;
 		int index_direction = 0;
 
+		if (INVERTED == true) { index_direction = 3; }
+
 		// for very first iteration no need to fetch direction
-		//if (loophole_index > 0)
-		//{
-			// fetch the next step
-			if (MODIFIER == '0')
-			{
-				next_positions = get_next_positions(current_pos);
-				current_pos = next_positions[index_direction];
-			}
-			else
-			{
-				// just get the next modifier position
-				current_pos = get_next_modifier_pos(current_pos);
-				index_direction = modifier_directions[MODIFIER];
-			}
-		//}
+		if (MODIFIER == '0')
+		{
+			//next_positions = get_next_positions(current_pos);
+			current_pos = get_next_pos(current_pos, DIRECTION);
+			index_direction = direction_index_map[DIRECTION];
+		}
+		else
+		{
+			// just get the next modifier position
+			current_pos = get_next_pos(current_pos, MODIFIER);
+			// still print current modifier direction, this doesnt change this iteration
+			index_direction = direction_index_map[MODIFIER];
+		}
 
 		// proces next position conditions (if any)
 		string next_pos_value = wmap[
@@ -218,9 +224,18 @@ int main()
 			{
 				// TODO break X if in breaker mode
 
-				// blockade so change direction
-				index_direction += 1;
-				current_pos = next_positions[index_direction];
+				// blockade up on next direction
+				// and if inverted go previous
+				if (INVERTED == false)
+				{
+					index_direction = (index_direction + 1) % 4;
+				}
+				else
+				{
+					index_direction = (index_direction - 1) % 4;
+				}
+				current_pos = get_next_pos(current_pos, index_direction_map[index_direction]);
+				//current_pos = next_positions[index_direction];
 				next_pos_value = wmap[get<0>(current_pos)][get<1>(current_pos)];
 				continue;
 			}
@@ -235,6 +250,18 @@ int main()
 			else if (check_set_modifier(next_pos_value))
 			{
 				// check_modifier ^ updates the global MODIFIER if there is one.
+				processed_next_direction = true;
+			}
+			else if (next_pos_value == string(1, INVERTER))
+			{
+				if (INVERTED == false)
+				{
+					INVERTED = true;
+				}
+				else
+				{
+					INVERTED = false;
+				}
 				processed_next_direction = true;
 			}
 			else if (next_pos_value == string(1, BOOTH))
