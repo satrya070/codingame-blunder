@@ -116,6 +116,30 @@ bool check_set_modifier(string new_pos_value)
 
 int main()
 {
+	// CODINGAME INPUT -----------------------------------------------------
+	//int l; int c;
+	//tuple<int, int> start_pos;
+	//vector<tuple<int, int>> direction;
+	//cin >> l >> c; cin.ignore();
+
+	//// construct the map in an array
+	//map<int, map<int, string>> wmap;
+	//for (int i = 0; i < l; i++) {
+	//	string row;
+	//	getline(cin, row);
+
+	//	for (int j = 0; j < l; j++)
+	//	{
+	//		// define start position
+	//		if (row[j] == '@')
+	//		{
+	//			start_pos = tuple(i, j);
+	//		}
+	//		wmap[i][j] = row[j];
+	//	}
+	//}
+
+	// ------------------ LOCAL INOUT ----------------------------------------------------
 	ifstream inputFile("./input.txt");
 
 	if (!inputFile.is_open()) {
@@ -123,8 +147,8 @@ int main()
 		return 1; // Return error code
 	}
 
-	int l = 8;
-	int c = 8;
+	int l = 5;
+	int c = 5;
 	tuple<int, int> start_pos;
 	vector<tuple<int, int>> direction;
 	//cin >> l >> c; cin.ignore();
