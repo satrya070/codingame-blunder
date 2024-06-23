@@ -30,6 +30,7 @@ const char INVERTER = 'I';
 bool INVERTED = false;
 char MODIFIER = '0';
 char DIRECTION = 'S';
+int INDEX_DIRECTION = 0;
 
 
 map<char, int> direction_index_map = {
@@ -54,27 +55,6 @@ void printTuple(const tuple<Types...>& myTuple)
 		cout << get<Index>(myTuple) << " ";
 		printTuple<Index + 1>(myTuple);
 	}
-}
-
-vector<tuple<int, int>> get_next_positions(
-	const tuple<int, int> CurrentPos
-)
-{
-	// gives back the position is the set order of S-E-N-W
-	int CurrentRow = get<0>(CurrentPos);
-	int CurrentCol = get<1>(CurrentPos);
-
-	// TODO filter out out of bounds
-
-	tuple<int, int> south = tuple<int, int>(CurrentRow + 1, CurrentCol);
-	tuple<int, int> east = tuple<int, int>(CurrentRow, CurrentCol + 1);
-	tuple<int, int> north = tuple<int, int>(CurrentRow - 1, CurrentCol);
-	tuple<int, int> west = tuple<int, int>(CurrentRow, CurrentCol - 1);
-
-	vector<tuple<int, int>> next_positions;
-	next_positions = { south, east, north, west };
-
-	return next_positions;
 }
 
 
@@ -190,23 +170,19 @@ int main()
 	while(endgame != true)
 	{
 		bool processed_next_direction = false;
-		int index_direction = 0;
+		//int index_direction = 0;
 		tuple<int, int> queued_pos;
 
-		if (INVERTED == true) { index_direction = 3; }
+		if (INVERTED == true) { INDEX_DIRECTION = 3; }
 
 		// for very first iteration no need to fetch direction
 		if (MODIFIER == '0')
 		{
 			queued_pos = get_next_pos(current_pos, DIRECTION);
-			index_direction = direction_index_map[DIRECTION];
 		}
 		else
 		{
-			// just get the next modifier position
 			queued_pos = get_next_pos(current_pos, MODIFIER);
-			// still print current modifier direction, this doesnt change this iteration
-			index_direction = direction_index_map[MODIFIER];
 		}
 
 		// proces next position conditions (if any)
@@ -222,35 +198,29 @@ int main()
 			}
 			else if ((next_pos_value == string(1, OBSTACLE)) || (next_pos_value == string(1, OBSTACLEX)) )
 			{
+				// blockade up on next direction
+
 				// TODO break X if in breaker mode
 
-				// blockade up on next direction
 				// and if inverted go previous
 				if (INVERTED == false)
 				{
-					index_direction = (index_direction + 1) % 4;
+					INDEX_DIRECTION = (INDEX_DIRECTION + 1) % 4;
 				}
 				else
 				{
-					index_direction = (index_direction - 1) % 4;
+					// TODO fix previous
+					INDEX_DIRECTION = (INDEX_DIRECTION - 1) % 4;
 				}
 				// gets the next priority pos from the ORIGINAL position!(hence queued pos)
-				queued_pos = get_next_pos(current_pos, index_direction_map[index_direction]);
+				queued_pos = get_next_pos(current_pos, index_direction_map[INDEX_DIRECTION]);
 				next_pos_value = wmap[get<0>(queued_pos)][get<1>(queued_pos)];
 				continue;
 			}
-			//else if (next_pos_value == string(1, OBSTACLEX))
-			//{
-			//	// blockade so change direction
-			//	index_direction += 1;
-			//	//current_pos = next_positions[index_direction];
-			//	queued_pos = get_next_pos(current_pos, index_direction_map[index_direction]);
-			//	next_pos_value = wmap[get<0>(queued_pos)][get<1>(queued_pos)];
-			//	continue;
-			//}
 			else if (check_set_modifier(next_pos_value))
 			{
 				// check_modifier ^ updates the global MODIFIER if there is one.
+				INDEX_DIRECTION = direction_index_map[MODIFIER];
 				processed_next_direction = true;
 			}
 			else if (next_pos_value == string(1, INVERTER))
@@ -273,7 +243,7 @@ int main()
 
 		// set current pos after qeued pos is processed
 		current_pos = queued_pos;
-		DIRECTION = index_direction_map[index_direction];
+		DIRECTION = index_direction_map[INDEX_DIRECTION];
 
 		// log positions
 		//cout << "current position: ";
@@ -282,7 +252,7 @@ int main()
 		//printTuple(next_positions[0]);
 
 		// output direction
-		cout << directionPrints[index_direction] << '\n';
+		cout << directionPrints[INDEX_DIRECTION] << '\n';
 
 		// increment loop
 		loophole_index += 1;
