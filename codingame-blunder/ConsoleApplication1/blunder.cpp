@@ -191,27 +191,27 @@ int main()
 	{
 		bool processed_next_direction = false;
 		int index_direction = 0;
+		tuple<int, int> queued_pos;
 
 		if (INVERTED == true) { index_direction = 3; }
 
 		// for very first iteration no need to fetch direction
 		if (MODIFIER == '0')
 		{
-			//next_positions = get_next_positions(current_pos);
-			current_pos = get_next_pos(current_pos, DIRECTION);
+			queued_pos = get_next_pos(current_pos, DIRECTION);
 			index_direction = direction_index_map[DIRECTION];
 		}
 		else
 		{
 			// just get the next modifier position
-			current_pos = get_next_pos(current_pos, MODIFIER);
+			queued_pos = get_next_pos(current_pos, MODIFIER);
 			// still print current modifier direction, this doesnt change this iteration
 			index_direction = direction_index_map[MODIFIER];
 		}
 
 		// proces next position conditions (if any)
 		string next_pos_value = wmap[
-			get<0>(current_pos)][get<1>(current_pos)
+			get<0>(queued_pos)][get<1>(queued_pos)
 		];
 
 		// process next to be pos (non-modifier)
@@ -234,19 +234,20 @@ int main()
 				{
 					index_direction = (index_direction - 1) % 4;
 				}
-				current_pos = get_next_pos(current_pos, index_direction_map[index_direction]);
-				//current_pos = next_positions[index_direction];
-				next_pos_value = wmap[get<0>(current_pos)][get<1>(current_pos)];
+				// gets the next priority pos from the ORIGINAL position!(hence queued pos)
+				queued_pos = get_next_pos(current_pos, index_direction_map[index_direction]);
+				next_pos_value = wmap[get<0>(queued_pos)][get<1>(queued_pos)];
 				continue;
 			}
-			else if (next_pos_value == string(1, OBSTACLEX))
-			{
-				// blockade so change direction
-				index_direction += 1;
-				current_pos = next_positions[index_direction];
-				next_pos_value = wmap[get<0>(current_pos)][get<1>(current_pos)];
-				continue;
-			}
+			//else if (next_pos_value == string(1, OBSTACLEX))
+			//{
+			//	// blockade so change direction
+			//	index_direction += 1;
+			//	//current_pos = next_positions[index_direction];
+			//	queued_pos = get_next_pos(current_pos, index_direction_map[index_direction]);
+			//	next_pos_value = wmap[get<0>(queued_pos)][get<1>(queued_pos)];
+			//	continue;
+			//}
 			else if (check_set_modifier(next_pos_value))
 			{
 				// check_modifier ^ updates the global MODIFIER if there is one.
@@ -269,6 +270,10 @@ int main()
 				endgame = true;
 				break;
 			}
+
+		// set current pos after qeued pos is processed
+		current_pos = queued_pos;
+		DIRECTION = index_direction_map[index_direction];
 
 		// log positions
 		//cout << "current position: ";
