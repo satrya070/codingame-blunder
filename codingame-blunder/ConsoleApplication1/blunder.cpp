@@ -29,6 +29,7 @@ const char INVERTER = 'I';
 
 bool INVERTED = false;
 char MODIFIER = '0';
+char MODIFIER_CACHE = '0';
 char DIRECTION = 'S';
 
 
@@ -91,22 +92,28 @@ bool check_set_modifier(string new_pos_value)
 	{
 		case 'S':
 			is_modifier = true;
-			MODIFIER = 'S';
+			//MODIFIER = 'S';
 			break;
 		case 'E':
 			is_modifier = true;
-			MODIFIER = 'E';
+			//MODIFIER = 'E';
 			break;
 		case 'N':
 			is_modifier = true;
-			MODIFIER = 'N';
+			//MODIFIER = 'N';
 			break;
 		case 'W':
 			is_modifier = true;
-			MODIFIER = 'W';
+			//MODIFIER = 'W';
 			break;
 		default:
 			break;
+	}
+
+	if (is_modifier == true)
+	{
+		//MODIFIER_CACHE = MODIFIER;
+		MODIFIER = pos_value;
 	}
 	return is_modifier;
 }
@@ -146,8 +153,8 @@ int main()
 		return 1; // Return error code
 	}
 
-	int l = 8;
-	int c = 8;
+	int l = 10;
+	int c = 10;
 	tuple<int, int> start_pos;
 	vector<tuple<int, int>> direction;
 	//cin >> l >> c; cin.ignore();
@@ -260,7 +267,7 @@ int main()
 			else if (check_set_modifier(next_pos_value))
 			{
 				// check_modifier ^ updates the global MODIFIER if there is one.
-				//INDEX_DIRECTION = direction_index_map[MODIFIER];
+				//INDEX_DIRECTION = direction_index_map[MODIFIER];;
 				processed_next_direction = true;
 			}
 			else if (next_pos_value == string(1, INVERTER))
@@ -281,6 +288,12 @@ int main()
 				break;
 			}
 
+		// stop this iteration before the (extra) print
+		if (endgame == true)
+		{
+			break;
+		}
+
 		// set current pos after qeued pos is processed
 		current_pos = queued_pos;
 		//DIRECTION = index_direction_map[INDEX_DIRECTION];
@@ -294,7 +307,33 @@ int main()
 		// output direction
 		if (MODIFIER != '0')
 		{
-			cout << directionPrints[direction_index_map[MODIFIER]] << '\n';
+			// this means the modifier has changed, so print previous direction/modifier
+			//if (MODIFIER != MODIFIER_CACHE)
+			//{
+			//	// this means the previous direction was a modifier
+			//	if (MODIFIER_CACHE != '0')
+			//	{
+			//		cout << directionPrints[direction_index_map[MODIFIER_CACHE]] << '\n';
+			//	}
+			//	// this means the previous direction was a regular DIRECTION
+			//	else
+			//	{
+			//		cout << directionPrints[direction_index_map[DIRECTION]] << '\n';
+			//	}
+			//}
+
+			// this means the previous direction was a modifier
+			if (MODIFIER_CACHE != '0')
+			{
+				cout << directionPrints[direction_index_map[MODIFIER_CACHE]] << '\n';
+				MODIFIER_CACHE = MODIFIER;
+			}
+			// this means the previous direction was a modifier
+			else
+			{
+				cout << directionPrints[direction_index_map[DIRECTION]] << '\n';
+				MODIFIER_CACHE = MODIFIER;
+			}
 		}
 		else
 		{
