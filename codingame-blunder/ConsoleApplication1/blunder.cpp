@@ -232,22 +232,6 @@ int main()
 
 				// TODO break X if in breaker mode
 
-				// and if inverted go previous
-				//if (INVERTED == false)
-				//{
-				//	index_direction = (index_direction + 1) % 4;
-				//}
-				//else
-				//{
-				//	// TODO fix previous
-				//	index_direction = (index_direction - 1) % 4;
-				//}
-				//// gets the next priority pos from the ORIGINAL position!(hence queued pos)
-				//queued_pos = get_next_pos(current_pos, index_direction_map[index_direction]);
-				//next_pos_value = wmap[get<0>(queued_pos)][get<1>(queued_pos)];
-				//DIRECTION = index_direction_map[index_direction];
-				//continue;
-
 				// TODO add reverse operation
 				// new way
 				for (int i = 0; i < 4; i++)
@@ -267,7 +251,6 @@ int main()
 			else if (check_set_modifier(next_pos_value))
 			{
 				// check_modifier ^ updates the global MODIFIER if there is one.
-				//INDEX_DIRECTION = direction_index_map[MODIFIER];;
 				processed_next_direction = true;
 			}
 			else if (next_pos_value == string(1, INVERTER))
@@ -307,21 +290,6 @@ int main()
 		// output direction
 		if (MODIFIER != '0')
 		{
-			// this means the modifier has changed, so print previous direction/modifier
-			//if (MODIFIER != MODIFIER_CACHE)
-			//{
-			//	// this means the previous direction was a modifier
-			//	if (MODIFIER_CACHE != '0')
-			//	{
-			//		cout << directionPrints[direction_index_map[MODIFIER_CACHE]] << '\n';
-			//	}
-			//	// this means the previous direction was a regular DIRECTION
-			//	else
-			//	{
-			//		cout << directionPrints[direction_index_map[DIRECTION]] << '\n';
-			//	}
-			//}
-
 			// this means the previous direction was a modifier
 			if (MODIFIER_CACHE != '0')
 			{
