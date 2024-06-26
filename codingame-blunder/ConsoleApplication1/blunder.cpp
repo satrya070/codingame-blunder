@@ -271,12 +271,6 @@ int main()
 				break;
 			}
 
-		// stop this iteration before the (extra) print
-		if (endgame == true)
-		{
-			break;
-		}
-
 		// set current pos after qeued pos is processed
 		current_pos = queued_pos;
 		//DIRECTION = index_direction_map[INDEX_DIRECTION];
@@ -310,6 +304,12 @@ int main()
 
 		// increment loop
 		loophole_index += 1;
+
+		// stop this iteration after the last direction print
+		if (endgame == true)
+		{
+			break;
+		}
 	}
 
 	// Write an answer using cout. DON'T FORGET THE "<< endl"
