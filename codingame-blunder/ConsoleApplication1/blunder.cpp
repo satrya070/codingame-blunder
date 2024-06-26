@@ -22,7 +22,7 @@ const char SOUTH = 'S';
 const char EAST = 'E';
 const char NORTH = 'N';
 const char WEST = 'W';
-const char BEER = 'B';
+const char BREAKER = 'B';
 const char TELEPORT = 'T';
 const char BOOTH = '$';
 const char INVERTER = 'I';
@@ -31,6 +31,7 @@ bool INVERTED = false;
 char MODIFIER = '0';
 char MODIFIER_CACHE = '0';
 char DIRECTION = 'S';
+bool BREAKER_MODE = false;
 
 
 map<char, int> direction_index_map = {
@@ -231,6 +232,12 @@ int main()
 				// blockade up on next direction
 
 				// TODO break X if in breaker mode
+				if ((BREAKER_MODE == true) && (next_pos_value == string(1, OBSTACLEX)) )
+				{
+					// destroy that wall
+					wmap[get<0>(queued_pos)][get<1>(queued_pos)] = " ";
+					break;
+				}
 
 				// TODO add reverse operation
 				// new way
@@ -252,6 +259,7 @@ int main()
 			{
 				// check_modifier ^ updates the global MODIFIER if there is one.
 				processed_next_direction = true;
+				break;
 			}
 			else if (next_pos_value == string(1, INVERTER))
 			{
@@ -265,6 +273,19 @@ int main()
 				}
 				processed_next_direction = true;
 			}
+			else if (next_pos_value == string(1, BREAKER))
+			{
+				if (BREAKER_MODE == false)
+				{
+					BREAKER_MODE = true;
+				}
+				else
+				{
+					BREAKER_MODE = false;
+				}
+				processed_next_direction = true;
+				break;
+			}
 			else if (next_pos_value == string(1, BOOTH))
 			{
 				endgame = true;
@@ -277,7 +298,7 @@ int main()
 
 		// log positions
 		//cout << "current position: ";
-		printTuple(current_pos);
+		//printTuple(current_pos);
 		//cout << " - next_position: ";
 		//printTuple(next_positions[0]);
 
