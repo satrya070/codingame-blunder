@@ -204,8 +204,6 @@ int main()
 		int index_direction = 0;
 		tuple<int, int> queued_pos;
 
-		if (INVERTED == true) { index_direction = 3; }
-
 		// for very first iteration no need to fetch direction
 		if (MODIFIER == '0')
 		{
@@ -229,9 +227,9 @@ int main()
 			}
 			else if ((next_pos_value == string(1, OBSTACLE)) || (next_pos_value == string(1, OBSTACLEX)) )
 			{
-				// blockade up on next direction
+				// process blockade up on next direction
 
-				// TODO break X if in breaker mode
+				// break X if in breaker mode
 				if ((BREAKER_MODE == true) && (next_pos_value == string(1, OBSTACLEX)) )
 				{
 					// destroy that wall
@@ -240,20 +238,37 @@ int main()
 				}
 
 				// TODO add reverse operation
-				// new way
-				for (int i = 0; i < 4; i++)
+				if (INVERTED == false)
 				{
-					queued_pos = get_next_pos(current_pos, index_direction_map[index_direction]);
-					next_pos_value = wmap[get<0>(queued_pos)][get<1>(queued_pos)];
-					if ((next_pos_value != string(1,OBSTACLE)) && ((next_pos_value != string(1, OBSTACLEX))) )
+					// regular handling of obstacles
+					for (int i = 0; i < 4; i++)
 					{
-						break;
+						queued_pos = get_next_pos(current_pos, index_direction_map[index_direction]);
+						next_pos_value = wmap[get<0>(queued_pos)][get<1>(queued_pos)];
+						if ((next_pos_value != string(1, OBSTACLE)) && ((next_pos_value != string(1, OBSTACLEX))))
+						{
+							break;
+						}
+						index_direction += 1;
 					}
-					index_direction += 1;
+				}
+				else
+				{
+					index_direction = 3;
+					// regular handling of obstacles
+					for (int i = 0; i < 4; i++)
+					{
+						queued_pos = get_next_pos(current_pos, index_direction_map[index_direction - i]);
+						next_pos_value = wmap[get<0>(queued_pos)][get<1>(queued_pos)];
+						if ((next_pos_value != string(1, OBSTACLE)) && ((next_pos_value != string(1, OBSTACLEX))))
+						{
+							index_direction = index_direction - i;
+							break;
+						}
+					}
 				}
 
 				DIRECTION = index_direction_map[index_direction];
-				//processed_next_direction = true;
 			}
 			else if (check_set_modifier(next_pos_value))
 			{
@@ -294,7 +309,6 @@ int main()
 
 		// set current pos after qeued pos is processed
 		current_pos = queued_pos;
-		//DIRECTION = index_direction_map[INDEX_DIRECTION];
 
 		// log positions
 		//cout << "current position: ";
@@ -305,13 +319,13 @@ int main()
 		// output direction
 		if (MODIFIER != '0')
 		{
-			// this means the previous direction was a modifier
+			// this means a modifier was already set
 			if (MODIFIER_CACHE != '0')
 			{
 				cout << directionPrints[direction_index_map[MODIFIER_CACHE]] << '\n';
 				MODIFIER_CACHE = MODIFIER;
 			}
-			// this means the previous direction was a modifier
+			// this means a modifier has just been set
 			else
 			{
 				cout << directionPrints[direction_index_map[DIRECTION]] << '\n';
