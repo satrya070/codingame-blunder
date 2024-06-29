@@ -33,6 +33,7 @@ char MODIFIER_CACHE = '0';
 char DIRECTION = 'S';
 bool BREAKER_MODE = false;
 
+map<int, tuple<int, int>> TELEPORTERS;
 
 map<char, int> direction_index_map = {
 	{'S', 0},
@@ -119,6 +120,20 @@ bool check_set_modifier(string new_pos_value)
 	return is_modifier;
 }
 
+int findOtherTeleporterId(tuple<int, int> teleport_position)
+{
+	//find teleport id by position
+	for (const auto& pair : TELEPORTERS)
+	{
+		if (pair.second != teleport_position)
+		{
+			return pair.first;
+		}
+	}
+
+	return -1;
+}
+
 
 
 int main()
@@ -131,6 +146,8 @@ int main()
 
 	//// construct the map in an array
 	//map<int, map<int, string>> wmap;
+	//map<tuple<int, int>, int> teleporters;
+	//int teleport_assign_id = 0;
 	//for (int i = 0; i < l; i++) {
 	//	string row;
 	//	getline(cin, row);
@@ -141,6 +158,12 @@ int main()
 	//		if (row[j] == '@')
 	//		{
 	//			start_pos = tuple(i, j);
+	//		}
+	// // define teleporters (if there)
+	//		if (row[j] == 'T')
+	//		{
+	//			teleporters[make_tuple(i, j)] = teleport_assign_id;
+	//			teleport_assign_id += 1;
 	//		}
 	//		wmap[i][j] = row[j];
 	//	}
@@ -162,6 +185,7 @@ int main()
 
 	// construct the map in an array
 	map<int, map<int, string>> wmap;
+	int teleport_assign_id = 0;
 	for (int i = 0; i < l; i++) {
 		string row;
 		getline(inputFile, row);
@@ -172,6 +196,12 @@ int main()
 			if (row[j] == '@')
 			{
 				start_pos = tuple(i, j);
+			}
+			// define teleporters (if there)
+			if (row[j] == 'T')
+			{
+				TELEPORTERS[teleport_assign_id] = make_tuple(i, j);
+				teleport_assign_id += 1;
 			}
 			wmap[i][j] = row[j];
 		}
@@ -300,6 +330,12 @@ int main()
 				}
 				processed_next_direction = true;
 				break;
+			}
+			else if (next_pos_value == string(1, TELEPORT))
+			{
+				int other_teleport_id = findOtherTeleporterId(make_tuple(get<0>(queued_pos), get<1>(queued_pos)));
+				queued_pos = TELEPORTERS[other_teleport_id];
+				processed_next_direction = true;
 			}
 			else if (next_pos_value == string(1, BOOTH))
 			{
