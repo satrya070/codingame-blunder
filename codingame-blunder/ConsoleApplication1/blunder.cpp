@@ -86,7 +86,7 @@ tuple<int, int> get_next_pos(tuple<int, int> current_pos, char direction_identif
 }
 
 
-bool check_set_modifier(string new_pos_value)
+bool check_modifier(string new_pos_value)
 {	
 	char pos_value = new_pos_value.at(0);
 	bool is_modifier = false;
@@ -112,12 +112,14 @@ bool check_set_modifier(string new_pos_value)
 			break;
 	}
 
-	if (is_modifier == true)
-	{
-		//MODIFIER_CACHE = MODIFIER;
-		MODIFIER = pos_value;
-	}
 	return is_modifier;
+}
+
+char get_modifier(string direction)
+{
+	char modifier_direction = direction[0];
+
+	return modifier_direction;
 }
 
 int findOtherTeleporterId(tuple<int, int> teleport_position)
@@ -162,7 +164,7 @@ int main()
 	// // define teleporters (if there)
 	//		if (row[j] == 'T')
 	//		{
-	//			teleporters[make_tuple(i, j)] = teleport_assign_id;
+	//			TELEPORTERS[teleport_assign_id] = make_tuple(i, j);
 	//			teleport_assign_id += 1;
 	//		}
 	//		wmap[i][j] = row[j];
@@ -233,6 +235,8 @@ int main()
 		bool processed_next_direction = false;
 		int index_direction = 0;
 		tuple<int, int> queued_pos;
+		bool new_modifier = false;
+		bool was_blocked = false;
 
 		// for very first iteration no need to fetch direction
 		if (MODIFIER == '0')
@@ -299,10 +303,11 @@ int main()
 				}
 
 				DIRECTION = index_direction_map[index_direction];
+				was_blocked = true;
 			}
-			else if (check_set_modifier(next_pos_value))
+			else if (check_modifier(next_pos_value))
 			{
-				// check_modifier ^ updates the global MODIFIER if there is one.
+				new_modifier = true;
 				processed_next_direction = true;
 				break;
 			}
@@ -348,29 +353,34 @@ int main()
 
 		// log positions
 		//cout << "current position: ";
-		//printTuple(current_pos);
+		printTuple(current_pos);
 		//cout << " - next_position: ";
 		//printTuple(next_positions[0]);
 
 		// output direction
 		if (MODIFIER != '0')
 		{
-			// this means a modifier was already set
-			if (MODIFIER_CACHE != '0')
+			if (was_blocked == false)
 			{
-				cout << directionPrints[direction_index_map[MODIFIER_CACHE]] << '\n';
-				MODIFIER_CACHE = MODIFIER;
+				// regular modifier step
+				cout << directionPrints[direction_index_map[MODIFIER]] << '\n';
 			}
-			// this means a modifier has just been set
 			else
 			{
+				// modifier has been altered due to obstacle blockage
 				cout << directionPrints[direction_index_map[DIRECTION]] << '\n';
-				MODIFIER_CACHE = MODIFIER;
+				MODIFIER = '0';
 			}
 		}
 		else
 		{
 			cout << directionPrints[direction_index_map[DIRECTION]] << '\n';
+		}
+
+		// set new modifier
+		if (new_modifier == true)
+		{
+			MODIFIER = get_modifier(next_pos_value);
 		}
 
 		// increment loop
