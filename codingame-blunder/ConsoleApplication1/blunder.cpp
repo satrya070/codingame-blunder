@@ -227,6 +227,7 @@ int main()
 		{3, "WEST"}
 	};
 	bool endgame = false;
+	vector<string> path;
 
 	// loop start
 	int loophole_index = 0;
@@ -237,6 +238,7 @@ int main()
 		tuple<int, int> queued_pos;
 		bool new_modifier = false;
 		bool was_blocked = false;
+		string recorded_step;
 
 		// for very first iteration no need to fetch direction
 		if (MODIFIER == '0')
@@ -353,7 +355,7 @@ int main()
 
 		// log positions
 		//cout << "current position: ";
-		printTuple(current_pos);
+		//printTuple(current_pos);
 		//cout << " - next_position: ";
 		//printTuple(next_positions[0]);
 
@@ -363,18 +365,21 @@ int main()
 			if (was_blocked == false)
 			{
 				// regular modifier step
-				cout << directionPrints[direction_index_map[MODIFIER]] << '\n';
+				recorded_step = directionPrints[direction_index_map[MODIFIER]];
+				//cout << directionPrints[direction_index_map[MODIFIER]] << '\n';
 			}
 			else
 			{
 				// modifier has been altered due to obstacle blockage
-				cout << directionPrints[direction_index_map[DIRECTION]] << '\n';
+				//cout << directionPrints[direction_index_map[DIRECTION]] << '\n';
+				recorded_step = directionPrints[direction_index_map[DIRECTION]];
 				MODIFIER = '0';
 			}
 		}
 		else
 		{
-			cout << directionPrints[direction_index_map[DIRECTION]] << '\n';
+			//cout << directionPrints[direction_index_map[DIRECTION]] << '\n';
+			recorded_step = directionPrints[direction_index_map[DIRECTION]];
 		}
 
 		// set new modifier
@@ -382,6 +387,9 @@ int main()
 		{
 			MODIFIER = get_modifier(next_pos_value);
 		}
+
+		// add to path
+		path.push_back(recorded_step);
 
 		// increment loop
 		loophole_index += 1;
@@ -391,6 +399,12 @@ int main()
 		{
 			break;
 		}
+	}
+
+	// output the build path
+	for (string step : path)
+	{
+		cout << step << "\n";
 	}
 
 	// Write an answer using cout. DON'T FORGET THE "<< endl"
